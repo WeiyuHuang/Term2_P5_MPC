@@ -32,10 +32,10 @@ class Mumps < Formula
 
   bottle :disable, "needs to be rebuilt with latest open-mpi"
 
-  depends_on "open-mpi" => [:cc, :cxx, :f90, :recommended]
+  depends_on :open-mpi => [:cc, :cxx, :f90, :recommended]
   depends_on "openblas" => OS.mac? ? :optional : :recommended
   depends_on "veclibfort" if build.without?("openblas") && OS.mac?
-  depends_on "gcc"
+  depends_on :fortran
 
   if build.with? "mpi"
     if OS.mac?
@@ -55,8 +55,6 @@ class Mumps < Formula
   end
 
   def install
-    ENV["FC"] = "gfortran"
-    ENV["FL"] = "gfortran"
     make_args = ["RANLIB=echo"]
     if OS.mac?
       # Building dylibs with mpif90 causes segfaults on 10.8 and 10.10. Use gfortran.
@@ -192,13 +190,13 @@ class Mumps < Formula
   end
 
   def caveats
-    s = <<~EOS
+    s = <<-EOS.undent
       MUMPS was built with shared libraries. If required,
       static libraries are available in
         #{opt_libexec}/lib
     EOS
     if build.without? "mpi"
-      s += <<~EOS
+      s += <<-EOS.undent
       You built a sequential MUMPS library.
       Please add #{libexec}/include to the include path
       when building software that depends on MUMPS.
